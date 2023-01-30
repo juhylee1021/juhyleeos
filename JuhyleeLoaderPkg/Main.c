@@ -42,33 +42,33 @@ const CHAR16* GetMemoryTypeUnicode(EFI_MEMORY_TYPE type)
 			return L"EfiLoaderCode";
 		case EfiLoaderData:
 			return L"EfiLoaderData";
-    case EfiBootServicesCode:
+	    case EfiBootServicesCode:
 			return L"EfiBootServicesCode";
-    case EfiBootServicesData:
+    	case EfiBootServicesData:
 			return L"EfiBootServicesData";
-    case EfiRuntimeServicesCode:
+    	case EfiRuntimeServicesCode:
 			return L"EfiRuntimeServicesCode";
-    case EfiRuntimeServicesData:
+    	case EfiRuntimeServicesData:
 			return L"EfiRuntimeServicesData";
-    case EfiConventionalMemory:
+    	case EfiConventionalMemory:
 			return L"EfiConventionalMemory";
-    case EfiUnusableMemory:
+    	case EfiUnusableMemory:
 			return L"EfiUnusableMemory";
-    case EfiACPIReclaimMemory:
+    	case EfiACPIReclaimMemory:
 			return L"EfiACPIReclaimMemory";
-    case EfiACPIMemoryNVS:
+    	case EfiACPIMemoryNVS:
 			return L"EfiACPIMemoryNVS";
-    case EfiMemoryMappedIO:
+    	case EfiMemoryMappedIO:
 			return L"EfiMemoryMappedIO";
-    case EfiMemoryMappedIOPortSpace:
+    	case EfiMemoryMappedIOPortSpace:
 			return L"EfiMemoryMappedIOPortSpace";
-    case EfiPalCode:
+    	case EfiPalCode:
 			return L"EfiPalCode";
-    case EfiPersistentMemory:
+    	case EfiPersistentMemory:
 			return L"EfiPersistentMemory";
-    case EfiMaxMemoryType:
+    	case EfiMaxMemoryType:
 			return L"EfiMaxMemoryType";
-    default:
+    	default:
 			return L"InvalidMemoryType";
 	}
 }
@@ -84,8 +84,9 @@ EFI_STATUS SaveMemoryMap(
 		"Index, Type, Type(name), PhysicalStart, NumberOfPages, Attribute\n";
 	len = AsciiStrLen(header);
 	file->Write(file, &len, header);
-	Print(L"map->buffer = %08lx, map->map_size = %08lx\n",
+	Print(L"map->buffer = 0x%08lx, map->map_size = 0x%08lx\n",
 			map->buffer, map->map_size);
+	Print(L"Index, Type, Type(name), PhysicalStart, NumberOfPages, Attribute\n");
 
 	EFI_PHYSICAL_ADDRESS iter;
 	int i;
@@ -94,6 +95,14 @@ EFI_STATUS SaveMemoryMap(
 			iter += map->descriptor_size, ++i)
 	{
 		EFI_MEMORY_DESCRIPTOR* desc = (EFI_MEMORY_DESCRIPTOR*)iter;
+		Print(
+				L"%u, 0x%x, %ls, 0x%08lx, 0x%lx, 0x%lx\n",
+				i,
+				desc->Type,
+				GetMemoryTypeUnicode(desc->Type),
+				desc->PhysicalStart,
+				desc->NumberOfPages,
+				desc->Attribute & 0xFFFFFlu);
 		len = AsciiSPrint(
 				buf, sizeof(buf),
 				"%u, %x, %-ls, %08lx, %lx, %lx\n",
@@ -139,7 +148,7 @@ EFI_STATUS UefiMain(
 		EFI_SYSTEM_TABLE* system_table
 		)
 {
-	Print(L"Let's get a memory map!\n");
+	Print(L"This is juhylee\'s first memory map\n");
 
 	CHAR8 memmap_buf [1024 * 32];
 	struct MemoryMap memmap;
