@@ -195,7 +195,7 @@ void Halt(void)
 {
 	while(1)
 	{
-		__asm("hlt");
+		__asm__("hlt");
 	}
 }
 
