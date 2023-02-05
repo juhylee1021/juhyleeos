@@ -295,9 +295,9 @@ EFI_STATUS UefiMain(
 
 //call kernel
 	UINT64 entry_addr = *(UINT64*)(kernel_base_addr + 24);
-	typedef void (*EntryFunctionPtr)(void);
+	typedef void (*EntryFunctionPtr)(UINT64, UINT64);
 	EntryFunctionPtr entry_point = (EntryFunctionPtr)entry_addr;
-	entry_point();
+	entry_point(gop->Mode->FrameBufferBase, gop->Mode->FrameBufferSize);
 
 	Print(L"Done\n");
 
