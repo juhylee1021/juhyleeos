@@ -8,6 +8,7 @@
 #include <Protocol/DiskIo2.h>
 #include <Protocol/BlockIo.h>
 #include <Guid/FileInfo.h>
+#include "frameBuffer.hpp"
 
 #include "ft.h"
 
@@ -356,9 +357,27 @@ EFI_STATUS UefiMain(
 
 //call kernel
 	UINT64 entry_addr = *(UINT64*)(kernel_base_addr + 24);
-	typedef void (*EntryFunctionPtr)(UINT64, UINT64);
+	struct FrameBuffer fb;
+	fb.base = (uint8_t*)gop->Mode->FrameBufferBase;
+	fb.size = gop->Mode->FrameBufferSize;
+	fb.pixelsPerScanLine = gop->Mode->Info->PixelsPerScanLine;
+	fb.horizontalResolution = gop->Mode->Info->HorizontalResolution;
+	fb.verticalResolution= gop->Mode->Info->VerticalResolution;
+	switch (gop->Mode->Info->PixelFormat)
+	{
+  	case PixelRedGreenBlueReserved8BitPerColor:
+			fb.pixelFormat = E_PIXEL_FORMAT_RGB_REVERSE_8BIT;
+			break;
+  	case PixelBlueGreenRedReserved8BitPerColor:
+			fb.pixelFormat = E_PIXEL_FORMAT_BGR_REVERSE_8BIT;
+			break;
+		default:
+			Print(L"Not defined pixel format: %d\n", gop->Mode->Info->PixelFormat);
+			Halt();
+	}
+	typedef void (*EntryFunctionPtr)(struct FrameBuffer*);
 	EntryFunctionPtr entry_point = (EntryFunctionPtr)entry_addr;
-	entry_point(gop->Mode->FrameBufferBase, gop->Mode->FrameBufferSize);
+	entry_point(&fb);
 
 	Print(L"Done\n");
 
