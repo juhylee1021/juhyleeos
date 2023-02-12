@@ -18,13 +18,13 @@ CXXFLAGS += -Wall -Wextra -Werror \
 						-ffreestanding \
 						-mno-red-zone -fno-exceptions -fno-rtti
 # make dependancy files
-CPPFLAGS = -MD
+CPPFLAGS += -MD
 #each LDFLAGS are... \
 	entry point is KernelMain \
 	no RElocation ReadOnly \
 	image base is 0x100000 \
 	static link
-LDFLAGS = --entry=KernelMain \
+LDFLAGS += --entry=KernelMain \
 					-z norelro \
 					-image-base=0x100000 \
 					--static
