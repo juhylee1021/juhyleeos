@@ -1,66 +1,11 @@
 #include <cstddef>
 #include <cstdint>
-
 #include "frameBuffer.hpp"
+#include "graphics.hpp"
+#include "font.hpp"
 
-typedef struct
-{
-	uint8_t r;
-	uint8_t g;
-	uint8_t b;
-} RGB_t;
-
-class PixelWriter
-{
-public:
-	PixelWriter() = delete;
-	PixelWriter(const FrameBuffer& fb) : mFb(fb) {}
-	PixelWriter(const PixelWriter& other) = delete;
-	virtual ~PixelWriter() = default;
-	PixelWriter& operator=(const PixelWriter& other) = delete;
-
-	virtual void Write(const int x, const int y, const RGB_t& color) = 0;
-protected:
-	uint8_t* PixelAt(const int x, const int y)
-	{
-		return mFb.base + 4 * (mFb.pixelsPerScanLine * y + x);
-	}
-private:
-
-protected:
-private:
-	const FrameBuffer& mFb;
-};
-
-class RGBReversePixelWriter : public PixelWriter
-{
-public:
-	RGBReversePixelWriter(const FrameBuffer& fb) : PixelWriter(fb) {}
-	virtual ~RGBReversePixelWriter() = default;
-
-	virtual void Write(const int x, const int y, const RGB_t& color)
-	{
-		uint8_t* pixel = PixelAt(x, y);
-		pixel[0] = color.r;
-		pixel[1] = color.g;
-		pixel[2] = color.b;
-	}
-};
-
-class BGRReversePixelWriter : public PixelWriter
-{
-public:
-	BGRReversePixelWriter(const FrameBuffer& fb) : PixelWriter(fb) {}
-	virtual ~BGRReversePixelWriter() = default;
-
-	virtual void Write(const int x, const int y, const RGB_t& color)
-	{
-		uint8_t* pixel = PixelAt(x, y);
-		pixel[0] = color.b;
-		pixel[1] = color.g;
-		pixel[2] = color.r;
-	}
-};
+RGB_t gBGColor = {54, 55, 69};
+RGB_t gFGColor = {213, 215, 235};
 
 void* operator new(size_t, void* buf)
 {
@@ -93,16 +38,23 @@ void KernelMain(FrameBuffer* fb)
 	{
 		for (uint32_t x = 0; x < fb->horizontalResolution; ++x)
 		{
-			gPixelWriterPtr->Write(x, y, {255, 255, 255});
+			gPixelWriterPtr->Write(x, y, gBGColor);
 		}
 	}
 	for (uint32_t y = 0; y < 200; ++y)
 	{
 		for (uint32_t x = 0; x < 100; ++x)
 		{
-			gPixelWriterPtr->Write(x, y, {0, 0, 255});
+			gPixelWriterPtr->Write(x, y, gFGColor);
 		}
 	}
+
+	int i = 0;
+	for (char c = '!'; c <= '~'; ++c, ++i)
+	{
+		WriteAscii(*gPixelWriterPtr, 32 + 8 * i, 300, c, gFGColor);
+	}
+
 	while(1)
 	{
 		__asm__("hlt");

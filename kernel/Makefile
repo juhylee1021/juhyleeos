@@ -31,7 +31,9 @@ LDFLAGS += --entry=KernelMain \
 
 RM = rm -f
 
-SRCS = main.cpp
+SRCS = main.cpp \
+			 graphics.cpp \
+			 font.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 DEPS = $(SRCS:.cpp=.d)
@@ -39,7 +41,7 @@ DEPS = $(SRCS:.cpp=.d)
 all: $(TARGET)
 
 $(TARGET): $(OBJS) Makefile
-	ld.lld $(LDFLAGS) -o $@ $(OBJS)
+	ld.lld $(LDFLAGS) -o $@ hankaku.o $(OBJS)
 
 %.o: %.cpp Makefile
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $@ -c $<
