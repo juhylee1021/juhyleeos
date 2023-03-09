@@ -9,6 +9,11 @@
 RGB_t gBGColor = {54, 55, 69};
 RGB_t gFGColor = {213, 215, 235};
 
+char gPixelWriterBuffer[sizeof(RGBReversePixelWriter)];
+PixelWriter* gPixelWriterPtr;
+char gConsoleBuffer[sizeof(Console)];
+Console* gConsolePtr;
+
 void* operator new(size_t, void* buf)
 {
 	return buf;
@@ -18,10 +23,19 @@ void operator delete(void*) noexcept
 {
 }
 
-char gPixelWriterBuffer[sizeof(RGBReversePixelWriter)];
-PixelWriter* gPixelWriterPtr;
-char gConsoleBuffer[sizeof(Console)];
-Console* gConsolePtr;
+int printk(const char* format, ...)
+{
+  va_list ap;
+  int result;
+  char buf[1024];
+
+  va_start(ap, format);
+  result = vsprintf(buf, format, ap);
+  va_end(ap);
+
+  gConsolePtr->PutString(buf);
+  return result;
+}
 
 extern "C"
 void KernelMain(FrameBuffer* fb)
@@ -37,14 +51,12 @@ void KernelMain(FrameBuffer* fb)
 		default:
 			while(1)__asm("hlt");
 	}
-
 	gConsolePtr = new(gConsoleBuffer)Console(*gPixelWriterPtr, gBGColor, gFGColor);
-	char buf[128];
-	for (int row = 0; row < 32; ++row)
-	{
-		sprintf(buf, "Line: %d\n", row);
-		gConsolePtr->PutString(buf);
-	}
+
+  for (int i = 0; i < 42; ++i) {
+    printk("printk: %d\n", i);
+  }
+
 	while(1)
 	{
 		__asm__("hlt");
