@@ -36,6 +36,7 @@ RM = rm -f
 SRCS = main.cpp \
 			 graphics.cpp \
 			 font.cpp \
+			 console.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 OBJS += newlib_support.o

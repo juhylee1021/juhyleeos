@@ -4,6 +4,7 @@
 #include "frameBuffer.hpp"
 #include "graphics.hpp"
 #include "font.hpp"
+#include "console.hpp"
 
 RGB_t gBGColor = {54, 55, 69};
 RGB_t gFGColor = {213, 215, 235};
@@ -19,6 +20,8 @@ void operator delete(void*) noexcept
 
 char gPixelWriterBuffer[sizeof(RGBReversePixelWriter)];
 PixelWriter* gPixelWriterPtr;
+char gConsoleBuffer[sizeof(Console)];
+Console* gConsolePtr;
 
 extern "C"
 void KernelMain(FrameBuffer* fb)
@@ -35,32 +38,13 @@ void KernelMain(FrameBuffer* fb)
 			while(1)__asm("hlt");
 	}
 
-	for (uint32_t y = 0; y < fb->verticalResolution; ++y)
-	{
-		for (uint32_t x = 0; x < fb->horizontalResolution; ++x)
-		{
-			gPixelWriterPtr->Write(x, y, gBGColor);
-		}
-	}
-	for (uint32_t y = 0; y < 200; ++y)
-	{
-		for (uint32_t x = 0; x < 100; ++x)
-		{
-			gPixelWriterPtr->Write(x, y, gFGColor);
-		}
-	}
-
-	int i = 0;
-	for (char c = '!'; c <= '~'; ++c, ++i)
-	{
-		WriteAscii(*gPixelWriterPtr, 32 + 8 * i, 300, c, gFGColor);
-	}
-	char hello[] = "Hello World!";
-	WriteString(*gPixelWriterPtr, 32, 332, hello, gFGColor);
+	gConsolePtr = new(gConsoleBuffer)Console(*gPixelWriterPtr, gBGColor, gFGColor);
 	char buf[128];
-	sprintf(buf, "I can use sprintf too! %d", 42);
-	WriteString(*gPixelWriterPtr, 32, 348, buf, gFGColor);
-
+	for (int row = 0; row < 32; ++row)
+	{
+		sprintf(buf, "Line: %d\n", row);
+		gConsolePtr->PutString(buf);
+	}
 	while(1)
 	{
 		__asm__("hlt");
