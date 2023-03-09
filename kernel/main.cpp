@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 #include "frameBuffer.hpp"
 #include "graphics.hpp"
 #include "font.hpp"
@@ -54,6 +55,11 @@ void KernelMain(FrameBuffer* fb)
 	{
 		WriteAscii(*gPixelWriterPtr, 32 + 8 * i, 300, c, gFGColor);
 	}
+	char hello[] = "Hello World!";
+	WriteString(*gPixelWriterPtr, 32, 332, hello, gFGColor);
+	char buf[128];
+	sprintf(buf, "I can use sprintf too! %d", 42);
+	WriteString(*gPixelWriterPtr, 32, 348, buf, gFGColor);
 
 	while(1)
 	{

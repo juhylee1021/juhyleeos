@@ -2,6 +2,8 @@ TARGET = kernel.elf
 
 CXX = clang++
 
+CFLAGS += -O2 -Wall -g --target=x86_64-elf -ffreestanding -mno-red-zone
+
 # each CXXFLAGS are... \
 	Warnning evetrything as error \
 	standard is C++17 \
@@ -33,18 +35,24 @@ RM = rm -f
 
 SRCS = main.cpp \
 			 graphics.cpp \
-			 font.cpp
+			 font.cpp \
 
 OBJS = $(SRCS:.cpp=.o)
+OBJS += newlib_support.o
+
 DEPS = $(SRCS:.cpp=.d)
+DEPS += newlib_support.d
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS) Makefile
-	ld.lld $(LDFLAGS) -o $@ hankaku.o $(OBJS)
+	ld.lld $(LDFLAGS) -o $@ hankaku.o $(OBJS) -lc
 
 %.o: %.cpp Makefile
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $@ -c $<
+
+%.o: %.c Makefile
+	clang $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
 
 clean:
 	$(RM) $(OBJS) $(DEPS) $(TARGET)

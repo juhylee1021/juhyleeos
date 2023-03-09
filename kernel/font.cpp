@@ -33,3 +33,14 @@ void WriteAscii(PixelWriter& pw, int x, int y, char ch, const RGB_t& colo)
   }
 	return;
 }
+
+void WriteString(PixelWriter& pw, int x, int y, const char* str, const RGB_t& colo)
+{
+	int i = 0;
+	while (*str)
+	{
+		WriteAscii(pw, x + 8 * i, y, *str, colo);
+		++i;
+		++str;
+	}
+}
