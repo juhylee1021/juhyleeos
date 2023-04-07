@@ -60,3 +60,20 @@ public:
 		pixel[2] = color.r;
 	}
 };
+
+template<typename T>
+struct Vector2D
+{
+	template<typename U>
+	Vector2D<T>& operator+=(const Vector2D<U>& rhs)
+	{
+		x += rhs.x;
+		y += rhs.y;
+		return *this;
+	}
+	T x;
+	T y;
+};
+
+void FillRactangle(PixelWriter& writer, const Vector2D<int>& pos, const Vector2D<int>& size, const RGB_t& color);
+void DrawRactangle(PixelWriter& writer, const Vector2D<int>& pos, const Vector2D<int>& size, const RGB_t& color);
